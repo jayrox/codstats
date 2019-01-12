@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>COD Stats</title>
+    <style>
+        div#stats_container>div span {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="stats_refresh">Refresh</button>
+    <input id="username" placeholder="Username" />
+    <select id="platform">
+        <option selected platform="xbl">xbox</option>
+        <option platform="psn">playstation</option>
+        <option platform="battle">battle.net</option>
+    </select>
+    <div id="stats_container"></div>
+
+    <script>
+        const COD_API_ENDPOINT = 'https://my.callofduty.com/api/papi-client';
+        const BO4_ENDPOINT = `${COD_API_ENDPOINT}/crm/cod/v2/title/bo4`;
+
+        const request = async (uri) => {
+            const response = await fetch(uri);
+            return await response.json();
+        }
+
+        const getRawMultiplayerStats = async (username, platform) => {
+            const uri = `${BO4_ENDPOINT}/platform/${platform}/gamer/${encodeURI(username)}/profile?type=mp`;
+            return request(uri);
+        }
+
+        const getPlatform = platform => {
+            if (platform === 'xbl') return 'Xbox';
+            if (platform === 'psn') return 'Playstation';
+            if (platform === 'battle') return 'Battle.net';
+
+            return '';
+        }
+
+        const genStats = (playerData) => {
+            Object.entries(playerData)
+                .forEach(element => {
+                    console.log(element);
+                });
+
+            return `
+                <div>
+                    <span>Username: ${playerData.username}</span>
+                    <span>Platform: ${getPlatform(playerData.platform)}</span>
+                    <span>Level: ${playerData.mp.level}</span>
+                    <span>Prestige: ${playerData.mp.prestige}</span>
+                    <span>Kills: ${playerData.mp.weekly.all.kills}</span>
+                    <span>Deaths: ${playerData.mp.weekly.all.deaths}</span>
+                    <span>EKIA: ${playerData.mp.weekly.all.ekia}</span>
+                    <span>Wins: ${playerData.mp.weekly.all.wins}</span>
+                    <span>Losses: ${playerData.mp.weekly.all.losses}</span>
+                </div>
+                `;
+        }
+
+    </script>
+
+    <script>
+        document.querySelector('button#stats_refresh')
+            .addEventListener('click', async event => {
+                const username = document.querySelector('input#username').value;
+                const platform = document.querySelector('select#platform option:checked')
+                    .getAttribute('platform');
+
+                const data = await getRawMultiplayerStats(username, platform);
+                document.querySelector('div#stats_container').innerHTML = genStats(data.data);
+            });
+    </script>
+
+</body>
+
+</html>
