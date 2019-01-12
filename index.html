@@ -4,8 +4,79 @@
 <head>
     <title>COD Stats</title>
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Lucida Sans', sans-serif
+        }
         div#stats_container>div span {
             display: block;
+        }
+
+        div#matches_container>div {
+            display: grid;
+            grid-template-areas: "mapname mode time" "hresults hteam1 hteam2" "results team1 team2";
+            font-size: 1rem;
+            background-color: whitesmoke;
+            border: 1px solid dimgrey;
+            border-radius: 3px;
+
+            margin: 20px auto;
+            padding: 1.5rem;
+        }
+
+        div#matches_container>div>span {
+            text-align: center;
+            line-height: 1.2rem;
+        }
+
+        div#matches_container>div>span:nth-child(-n+3) {
+            border-bottom: 1px solid grey;
+        }
+
+        div#matches_container>div>span[name="map"] {
+            grid-area: mapname;
+            border-bottom: 1px solid grey;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 1000;
+            margin-bottom: 5px;
+        }
+
+        div#matches_container>div>span[name="mode"] {
+            grid-area: mode;
+            margin-bottom: 5px;
+        }
+
+        div#matches_container>div>span[name="time"] {
+            grid-area: time;
+            margin-bottom: 5px;
+        }
+
+        div#matches_container>div>span[name="header_results"] {
+            grid-area: hresults;
+            font-weight: 600;
+        }
+
+        div#matches_container>div>span[name="header_team1"] {
+            grid-area: hteam1;
+            font-weight: 600;
+        }
+
+        div#matches_container>div>span[name="header_team2"] {
+            grid-area: hteam2;
+            font-weight: 600;
+        }
+
+        div#matches_container>div>span[name="results"] {
+            grid-area: results;
+        }
+
+        div#matches_container>div>span[name="team1"] {
+            grid-area: team1;
+        }
+
+        div#matches_container>div>span[name="team2"] {
+            grid-area: team2;
         }
     </style>
 </head>
@@ -26,7 +97,10 @@
         const BO4_ENDPOINT = `${COD_API_ENDPOINT}/crm/cod/v2/title/bo4`;
 
         const request = async (uri) => {
-            const response = await fetch(uri);
+            const options = {
+                method: 'GET'
+            };
+            const response = await fetch(uri, options);
             console.log(uri, response.status);
             return await response.json();
         }
@@ -49,6 +123,81 @@
             if (platform === 'battle') return 'Battle.net';
 
             return '';
+        }
+
+        const maps = new Map([
+            ['mp_firingrange2', 'Firing Range'],
+            ['mp_firingrange2_alt', 'Firing Range Night'],
+            ['mp_frenetic', 'mp_frenetic'],
+            ['mp_gridlock', 'Gridlock'],
+            ['mp_hacienda', 'Hacienda'],
+            ['mp_icebreaker', 'Icebreaker'],
+            ['mp_jungle2', 'Jungle'],
+            ['mp_militia', 'Militia'],
+            ['mp_morocco', 'Morocco'],
+            ['mp_mountain2', 'Summit'],
+            ['mp_offshore', 'Contraband'],
+            ['mp_seaside', 'Seaside'],
+            ['mp_seaside_alt', 'Seaside Sunset'],
+            ['mp_silo', 'Payload '],
+            ['mp_slums2', 'Slums'],
+            ['mp_urban', 'Arsenal']
+        ]);
+
+        const getMapName = name => {
+            let mapName = maps.get(name);
+            return mapName ? mapName : name;
+        }
+
+        const modes = new Map([
+            ['gun', 'gun'],
+            ['dom', 'dom'],
+            ['dm_hc', 'Hardcore Deathmatch'],
+            ['conf_hc', 'conf_hc'],
+            ['oic', 'oic'],
+            ['dm', 'dm'],
+            ['conf', 'conf'],
+            ['hctdm', 'hctdm'],
+            ['hckoth', 'hckoth'],
+            ['hcdom', 'Hardcore Domination'],
+            ['3106925630800436861', 'Hardcore Domination'],
+            ['sd', 'sd'],
+            ['ball', 'ball'],
+            ['ctf', 'ctf'],
+            ['payload', 'payload'],
+            ['prop', 'prop'],
+            ['tdm_hc', 'tdm_hc'],
+            ['warzone', 'warzone'],
+            ['control_hc', 'control_hc'],
+            ['shrp', 'shrp'],
+            ['bounty', 'bounty'],
+            ['koth', 'koth'],
+            ['control', 'control'],
+            ['sd_hc', 'sd_hc'],
+            ['hostage', 'hostage'],
+            ['dom_hc', 'Hardcore Domination'],
+            ['clean', 'clean'],
+            ['hcdm', 'hcdm'],
+            ['frontline', 'frontline'],
+            ['tdm', 'tdm'],
+            ['hcsd', 'hcsd'],
+            ['infil', 'infil'],
+            ['infect', 'infect'],
+            ['escort', 'escort']
+        ]);
+
+        const getMode = name => {
+            let modeName = modes.get(name);
+            return modeName ? modeName : name;
+        }
+
+        const upperCaseFirst = str => {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        const getDate = seconds => {
+            console.log(seconds)
+            return new Date(seconds * 1000).toLocaleString();
         }
 
         const genStats = (playerData) => {
@@ -86,12 +235,19 @@
             return matchesData.matches.map(e => {
                 return `
                     <div>
-                        <span>Map: ${e.map}</span>
-                        <span>Result: ${e.result} (${winningTeam(e.team1Score, '1', e.winningTeam)} - ${winningTeam(e.team2Score, '2', e.winningTeam)})</span>
+                        <span name="map">${getMapName(e.map)}</span>
+                        <span name="mode">${getMode(e.mode)}</span>
+                        <span name="time">${getDate(e.utcStartSeconds)}</span>
+                        <span name="header_results">Result</span>
+                        <span name="header_team1">Team 1</span>
+                        <span name="header_team2">Team 2</span>
+                        <span name="results">${upperCaseFirst(e.result)}</span>
+                        <span name="team1">${winningTeam(e.team1Score, '1', e.winningTeam)}</span>
+                        <span name="team2">${winningTeam(e.team2Score, '2', e.winningTeam)}</span>
                     </div>
                     `;
             })
-            .join('\n');
+                .join('\n');
         }
 
     </script>
