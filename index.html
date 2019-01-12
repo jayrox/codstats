@@ -12,13 +12,14 @@
 
 <body>
     <button id="stats_refresh">Refresh</button>
-    <input id="username" placeholder="Username" />
+    <input id="username" placeholder="Username" value="i am jayrox" />
     <select id="platform">
         <option selected platform="xbl">xbox</option>
         <option platform="psn">playstation</option>
         <option platform="battle">battle.net</option>
     </select>
     <div id="stats_container"></div>
+    <div id="matches_container"></div>
 
     <script>
         const COD_API_ENDPOINT = 'https://my.callofduty.com/api/papi-client';
@@ -26,12 +27,20 @@
 
         const request = async (uri) => {
             const response = await fetch(uri);
+            console.log(uri, response.status);
             return await response.json();
         }
 
         const getRawMultiplayerStats = async (username, platform) => {
             const uri = `${BO4_ENDPOINT}/platform/${platform}/gamer/${encodeURI(username)}/profile?type=mp`;
-            return request(uri);
+            return await request(uri);
+        }
+
+        const getRawMultiplayerMatchesStats = async (username, platform, start = 0, end = 0) => {
+            const startTimestamp = start !== 0 ? start.getTime() : 0;
+            const endTimestamp = end !== 0 ? end.getTime() : 0;
+            const uri = `${BO4_ENDPOINT}/platform/${platform}/gamer/${encodeURI(username)}/matches/mp/start/${startTimestamp}/end/${endTimestamp}/details`;
+            return await request(uri);
         }
 
         const getPlatform = platform => {
@@ -43,10 +52,10 @@
         }
 
         const genStats = (playerData) => {
-            Object.entries(playerData)
-                .forEach(element => {
-                    console.log(element);
-                });
+            // Object.entries(playerData)
+            //     .forEach(element => {
+            //         console.log(element);
+            //     });
 
             return `
                 <div>
@@ -63,6 +72,28 @@
                 `;
         }
 
+        const winningTeam = (score, team, winningTeam) => {
+            if (team === winningTeam) return `<strong>${score}</strong>`;
+            return score;
+        }
+
+        const genMatches = (matchesData) => {
+            // Object.entries(matchesData)
+            //     .forEach(element => {
+            //         console.log(element);
+            //     });
+
+            return matchesData.matches.map(e => {
+                return `
+                    <div>
+                        <span>Map: ${e.map}</span>
+                        <span>Result: ${e.result} (${winningTeam(e.team1Score, '1', e.winningTeam)} - ${winningTeam(e.team2Score, '2', e.winningTeam)})</span>
+                    </div>
+                    `;
+            })
+            .join('\n');
+        }
+
     </script>
 
     <script>
@@ -74,6 +105,9 @@
 
                 const data = await getRawMultiplayerStats(username, platform);
                 document.querySelector('div#stats_container').innerHTML = genStats(data.data);
+
+                const d = await getRawMultiplayerMatchesStats(username, platform);
+                document.querySelector('div#matches_container').innerHTML = genMatches(d.data);
             });
     </script>
 
