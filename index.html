@@ -350,6 +350,12 @@
         // Round numbers to 2 decimal places
         const rounder = num => Math.round(parseFloat(num) * 100) / 100;
 
+        // Highlight winning team's score
+        const winningTeam = (score, team, winningTeam) => {
+            return (team === winningTeam) ? `<strong>${score}</strong>` : score;
+        }
+
+        // Gen player's stats main table
         const genStats = (playerData) => {
             return `
                 <div id="player">
@@ -357,17 +363,12 @@
                     <span name="platform">${getPlatform(playerData.platform)}</span>
                     <span name="level">Level: ${playerData.mp.level}</span>
                     <span name="prestige">Prestige: ${playerData.mp.prestige}</span>
-                    <span name="kills">Kills: ${playerData.mp.weekly.all.kills}</span>
-                    <span name="deaths">Deaths: ${playerData.mp.weekly.all.deaths}</span>
-                    <span name="wins">Wins: ${playerData.mp.weekly.all.wins}</span>
-                    <span name="losses">Losses: ${playerData.mp.weekly.all.losses}</span>
+                    <span name="kills">Kills: ${playerData.mp.lifetime.all.kills}</span>
+                    <span name="deaths">Deaths: ${playerData.mp.lifetime.all.deaths}</span>
+                    <span name="wins">Wins: ${playerData.mp.lifetime.all.wins}</span>
+                    <span name="losses">Losses: ${playerData.mp.lifetime.all.losses}</span>
                 </div>
                 `;
-        }
-
-        // Highlight winning team's score
-        const winningTeam = (score, team, winningTeam) => {
-            return (team === winningTeam) ? `<strong>${score}</strong>` : score;
         }
 
         const genMatches = (matchesData) => {
