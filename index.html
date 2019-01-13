@@ -9,6 +9,56 @@
             font-family: 'Lucida Sans', sans-serif
         }
 
+        div#player {
+            display: grid;
+            grid-template-areas: "name name" "platform platform" "level prestige" "kills deaths" "wins losses";
+            font-size: 1rem;
+            background-color: whitesmoke;
+            border: 1px solid dimgrey;
+            border-radius: 3px;
+
+            margin: 20px auto;
+            padding: 1.5rem;
+        }
+
+        div#player>span {
+            text-align: center;
+        }
+
+        div#player>span[name="name"] {
+            grid-area: name;
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        div#player>span[name="platform"] {
+            grid-area: platform;
+        }
+
+        div#player>span[name="level"] {
+            grid-area: level;
+        }
+
+        div#player>span[name="prestige"] {
+            grid-area: prestige;
+        }
+
+        div#player>span[name="kills"] {
+            grid-area: kills;
+        }
+
+        div#player>span[name="deaths"] {
+            grid-area: deaths;
+        }
+
+        div#player>span[name="wins"] {
+            grid-area: wins;
+        }
+
+        div#player>span[name="losses"] {
+            grid-area: losses   ;
+        }
+
         div#stats_container>div span {
             display: block;
         }
@@ -39,7 +89,7 @@
             border-bottom: 1px solid grey;
             text-align: center;
             font-size: 1.5rem;
-            font-weight: 1000;
+            font-weight: 900;
             margin-bottom: 5px;
         }
 
@@ -152,9 +202,9 @@
     <button id="stats_refresh">Refresh</button>
     <input id="username" placeholder="Username" value="i am jayrox" />
     <select id="platform">
-        <option selected platform="xbl">xbox</option>
-        <option platform="psn">playstation</option>
-        <option platform="battle">battle.net</option>
+        <option selected platform="xbl">Xbox One</option>
+        <option platform="psn">Playstation</option>
+        <option platform="battle">Battle.net</option>
     </select>
     <div id="stats_container"></div>
     <div id="matches_container"></div>
@@ -189,7 +239,7 @@
 
         // Get platform full name
         const getPlatform = platform => {
-            if (platform === 'xbl') return 'Xbox';
+            if (platform === 'xbl') return 'Xbox One';
             if (platform === 'psn') return 'Playstation';
             if (platform === 'battle') return 'Battle.net';
 
@@ -208,6 +258,7 @@
             ['mp_militia', 'Militia'],
             ['mp_morocco', 'Morocco'],
             ['mp_mountain2', 'Summit'],
+            ['mp_nuketown_4', 'Nuketown'],
             ['mp_offshore', 'Contraband'],
             ['mp_seaside', 'Seaside'],
             ['mp_seaside_alt', 'Seaside Sunset'],
@@ -268,9 +319,13 @@
 
         // Map of specialist names
         const specialists = new Map([
+            ['prt_mp_swatpolice', 'Ajax'],
+            ['prt_mp_battery', 'Battery'],
             ['477755593455581584', 'Crash'],
             ['prt_mp_buffassault', 'Crash'],
-            ['prt_mp_firebreak', 'Firebreak']
+            ['prt_mp_firebreak', 'Firebreak'],
+            ['prt_mp_recon', 'Recon'],
+            ['prt_mp_enforcer', 'Seraph']
         ]);
 
         // Get specialist name
@@ -297,16 +352,15 @@
 
         const genStats = (playerData) => {
             return `
-                <div>
-                    <span>Username: ${playerData.username}</span>
-                    <span>Platform: ${getPlatform(playerData.platform)}</span>
-                    <span>Level: ${playerData.mp.level}</span>
-                    <span>Prestige: ${playerData.mp.prestige}</span>
-                    <span>Kills: ${playerData.mp.weekly.all.kills}</span>
-                    <span>Deaths: ${playerData.mp.weekly.all.deaths}</span>
-                    <span>EKIA: ${playerData.mp.weekly.all.ekia}</span>
-                    <span>Wins: ${playerData.mp.weekly.all.wins}</span>
-                    <span>Losses: ${playerData.mp.weekly.all.losses}</span>
+                <div id="player">
+                    <span name="name">${playerData.username}</span>
+                    <span name="platform">${getPlatform(playerData.platform)}</span>
+                    <span name="level">Level: ${playerData.mp.level}</span>
+                    <span name="prestige">Prestige: ${playerData.mp.prestige}</span>
+                    <span name="kills">Kills: ${playerData.mp.weekly.all.kills}</span>
+                    <span name="deaths">Deaths: ${playerData.mp.weekly.all.deaths}</span>
+                    <span name="wins">Wins: ${playerData.mp.weekly.all.wins}</span>
+                    <span name="losses">Losses: ${playerData.mp.weekly.all.losses}</span>
                 </div>
                 `;
         }
