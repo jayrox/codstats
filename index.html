@@ -8,13 +8,26 @@
             box-sizing: border-box;
             font-family: 'Lucida Sans', sans-serif
         }
+
         div#stats_container>div span {
             display: block;
         }
 
         div#matches_container>div {
             display: grid;
-            grid-template-areas: "mapname mode time" "hresults hteam1 hteam2" "results team1 team2";
+            grid-template-areas:
+                "mapname mode time"
+                "hresults hteam1 hteam2"
+                "results team1 team2"
+                "hmatchstats hmatchstats hmatchstats"
+                "kills kills kills"
+                "deaths deaths deaths"
+                "assists assists assists"
+                "ekia ekia ekia"
+                "ekiadratio ekiadratio ekiadratio"
+                "kdratio kdratio kdratio"
+                "score score score"
+                "spm spm spm";
             font-size: 1rem;
             background-color: whitesmoke;
             border: 1px solid dimgrey;
@@ -78,6 +91,67 @@
         div#matches_container>div>span[name="team2"] {
             grid-area: team2;
         }
+
+        div#matches_container>div>div[name] {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 2px;
+        }
+
+        div#matches_container>div>div:nth-child(odd) {
+            background-color: snow;
+        }
+
+        div#matches_container>div>div:nth-child(even) {
+            background-color: lightgray;
+        }
+
+        div#matches_container>div>div[name="assists"] {
+            grid-area: assists;
+            text-align: left;
+        }
+
+        div#matches_container>div>div[name="kills"] {
+            grid-area: kills;
+            text-align: left;
+        }
+
+        div#matches_container>div>div[name="deaths"] {
+            grid-area: deaths;
+            text-align: left;
+        }
+
+        div#matches_container>div>div[name="ekia"] {
+            grid-area: ekia;
+            text-align: left;
+        }
+
+        div#matches_container>div>div[name="ekiadratio"] {
+            grid-area: ekiadratio;
+            text-align: left;
+        }
+
+        div#matches_container>div>div[name="kdratio"] {
+            grid-area: kdratio;
+            text-align: left;
+        }
+
+        div#matches_container>div>div[name="score"] {
+            grid-area: score;
+            text-align: left;
+        }
+
+        div#matches_container>div>div[name="spm"] {
+            grid-area: spm;
+            text-align: left;
+        }
+
+        div#matches_container>div>span[name="header_matchstats"] {
+            grid-area: hmatchstats;
+            background-color: darkgray;
+            margin: 10px 0;
+            padding: 3px;
+        }
     </style>
 </head>
 
@@ -96,6 +170,7 @@
         const COD_API_ENDPOINT = 'https://my.callofduty.com/api/papi-client';
         const BO4_ENDPOINT = `${COD_API_ENDPOINT}/crm/cod/v2/title/bo4`;
 
+        // Fetch Request
         const request = async (uri) => {
             const options = {
                 method: 'GET'
@@ -105,11 +180,13 @@
             return await response.json();
         }
 
+        // Get multiplayer player stats
         const getRawMultiplayerStats = async (username, platform) => {
             const uri = `${BO4_ENDPOINT}/platform/${platform}/gamer/${encodeURI(username)}/profile?type=mp`;
             return await request(uri);
         }
 
+        // Get multiplayer match stats
         const getRawMultiplayerMatchesStats = async (username, platform, start = 0, end = 0) => {
             const startTimestamp = start !== 0 ? start.getTime() : 0;
             const endTimestamp = end !== 0 ? end.getTime() : 0;
@@ -117,6 +194,7 @@
             return await request(uri);
         }
 
+        // Get platform full name
         const getPlatform = platform => {
             if (platform === 'xbl') return 'Xbox';
             if (platform === 'psn') return 'Playstation';
@@ -125,6 +203,7 @@
             return '';
         }
 
+        // Map name map
         const maps = new Map([
             ['mp_firingrange2', 'Firing Range'],
             ['mp_firingrange2_alt', 'Firing Range Night'],
@@ -144,11 +223,13 @@
             ['mp_urban', 'Arsenal']
         ]);
 
+        // Get Map name
         const getMapName = name => {
             let mapName = maps.get(name);
             return mapName ? mapName : name;
         }
 
+        // Mode name map
         const modes = new Map([
             ['gun', 'gun'],
             ['dom', 'dom'],
@@ -186,26 +267,22 @@
             ['escort', 'escort']
         ]);
 
+        // Get Mode name
         const getMode = name => {
             let modeName = modes.get(name);
             return modeName ? modeName : name;
         }
 
-        const upperCaseFirst = str => {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
+        // Uppercase first character
+        const upperCaseFirst = str => str.charAt(0).toUpperCase() + str.slice(1);
 
-        const getDate = seconds => {
-            console.log(seconds)
-            return new Date(seconds * 1000).toLocaleString();
-        }
+        // Convert UTC to Local Time
+        const getDate = seconds => new Date(seconds * 1000).toLocaleString();
+
+        // Round numbers to 2 decimal places
+        const rounder = num => Math.round(parseFloat(num) * 100) / 100;
 
         const genStats = (playerData) => {
-            // Object.entries(playerData)
-            //     .forEach(element => {
-            //         console.log(element);
-            //     });
-
             return `
                 <div>
                     <span>Username: ${playerData.username}</span>
@@ -221,17 +298,12 @@
                 `;
         }
 
+        // Highlight winning team's score
         const winningTeam = (score, team, winningTeam) => {
-            if (team === winningTeam) return `<strong>${score}</strong>`;
-            return score;
+            return (team === winningTeam) ? `<strong>${score}</strong>` : score;
         }
 
         const genMatches = (matchesData) => {
-            // Object.entries(matchesData)
-            //     .forEach(element => {
-            //         console.log(element);
-            //     });
-
             return matchesData.matches.map(e => {
                 return `
                     <div>
@@ -244,6 +316,40 @@
                         <span name="results">${upperCaseFirst(e.result)}</span>
                         <span name="team1">${winningTeam(e.team1Score, '1', e.winningTeam)}</span>
                         <span name="team2">${winningTeam(e.team2Score, '2', e.winningTeam)}</span>
+                        <span name="header_matchstats">Match Stats</span>
+                        <div name="kills">
+                            <span>Kills</span>
+                            <span>${e.playerStats.kills}</span>
+                        </div>
+                        <div name="deaths">
+                            <span>Deaths</span>
+                            <span>${e.playerStats.deaths}</span>
+                        </div>
+                        <div name="assists">
+                            <span>Assists</span>
+                            <span>${e.playerStats.assists}</span>
+                        </div>
+                        <div name="ekia">
+                            <span>EKIA</span>
+                            <span>${e.playerStats.ekia}</span>
+                        </div>
+                        <div name="ekiadratio">
+                            <span>EKIA/D Ratio</span>
+                            <span>${rounder(e.playerStats.ekiadRatio)}</span>
+                        </div>
+                        <div name="kdratio">
+                            <span>K/D Ratio</span>
+                            <span>${rounder(e.playerStats.kdRatio)}</span>
+                        </div>
+                        <div name="score">
+                            <span>Score</span>
+                            <span>${e.playerStats.score}</span>
+                        </div>
+                        <div name="spm">
+                            <span>Score Per Minute</span>
+                            <span>${rounder(e.playerStats.scorePerMinute)}</span>
+                        </div>
+
                     </div>
                     `;
             })
@@ -260,10 +366,12 @@
                     .getAttribute('platform');
 
                 const data = await getRawMultiplayerStats(username, platform);
-                document.querySelector('div#stats_container').innerHTML = genStats(data.data);
+                document.querySelector('div#stats_container')
+                    .innerHTML = genStats(data.data);
 
                 const d = await getRawMultiplayerMatchesStats(username, platform);
-                document.querySelector('div#matches_container').innerHTML = genMatches(d.data);
+                document.querySelector('div#matches_container')
+                    .innerHTML = genMatches(d.data);
             });
     </script>
 
