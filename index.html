@@ -15,19 +15,7 @@
 
         div#matches_container>div {
             display: grid;
-            grid-template-areas:
-                "mapname mode time"
-                "hresults hteam1 hteam2"
-                "results team1 team2"
-                "hmatchstats hmatchstats hmatchstats"
-                "kills kills kills"
-                "deaths deaths deaths"
-                "assists assists assists"
-                "ekia ekia ekia"
-                "ekiadratio ekiadratio ekiadratio"
-                "kdratio kdratio kdratio"
-                "score score score"
-                "spm spm spm";
+            grid-template-areas: "mapname mode time" "hresults hteam1 hteam2" "results team1 team2" "hmatchstats hmatchstats hmatchstats" "specialist specialist specialist" "kills kills kills" "deaths deaths deaths" "assists assists assists" "ekia ekia ekia" "ekiadratio ekiadratio ekiadratio" "kdratio kdratio kdratio" "score score score" "spm spm spm";
             font-size: 1rem;
             background-color: whitesmoke;
             border: 1px solid dimgrey;
@@ -104,6 +92,11 @@
 
         div#matches_container>div>div:nth-child(even) {
             background-color: lightgray;
+        }
+
+        div#matches_container>div>div[name="specialist"] {
+            grid-area: specialist;
+            text-align: left;
         }
 
         div#matches_container>div>div[name="assists"] {
@@ -269,8 +262,28 @@
 
         // Get Mode name
         const getMode = name => {
-            let modeName = modes.get(name);
+            const modeName = modes.get(name);
             return modeName ? modeName : name;
+        }
+
+        // Map of specialist names
+        const specialists = new Map([
+            ['477755593455581584', 'Crash'],
+            ['prt_mp_buffassault', 'Crash'],
+            ['prt_mp_firebreak', 'Firebreak']
+        ]);
+
+        // Get specialist name
+        const getSpecialist = specialist => {
+            const specialistName = specialists.get(specialist);
+            return specialistName ? specialistName : specialist;
+        }
+
+        // Map specialists
+        const getSpecialists = specialists => {
+            return Object.entries(specialists)
+                .filter(n => n[0] === '0' ? false : true)
+                .map(e => getSpecialist(e[0])).join('<br>');
         }
 
         // Uppercase first character
@@ -317,6 +330,11 @@
                         <span name="team1">${winningTeam(e.team1Score, '1', e.winningTeam)}</span>
                         <span name="team2">${winningTeam(e.team2Score, '2', e.winningTeam)}</span>
                         <span name="header_matchstats">Match Stats</span>
+                        <div name="specialist">
+                            <span>Specialist</span>
+                            <span>${getSpecialists(e.player.specialistStats)}</span>
+                        </div>
+                        
                         <div name="kills">
                             <span>Kills</span>
                             <span>${e.playerStats.kills}</span>
