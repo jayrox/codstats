@@ -4,6 +4,7 @@
 <head>
     <title>COD Stats</title>
     <style>
+
         * {
             box-sizing: border-box;
             font-family: 'Lucida Sans', sans-serif
@@ -56,7 +57,7 @@
         }
 
         div#player>span[name="losses"] {
-            grid-area: losses   ;
+            grid-area: losses;
         }
 
         div#stats_container>div span {
@@ -65,14 +66,13 @@
 
         div#matches_container>div {
             display: grid;
-            grid-template-areas: "mapname mode time" "hresults hteam1 hteam2" "results team1 team2" "hmatchstats hmatchstats hmatchstats" "specialist specialist specialist" "kills kills kills" "deaths deaths deaths" "assists assists assists" "ekia ekia ekia" "ekiadratio ekiadratio ekiadratio" "kdratio kdratio kdratio" "score score score" "spm spm spm";
             font-size: 1rem;
             background-color: whitesmoke;
             border: 1px solid dimgrey;
             border-radius: 3px;
 
             margin: 20px auto;
-            padding: 1.5rem;
+            grid-template-columns: 1fr;
         }
 
         div#matches_container>div>span {
@@ -84,116 +84,49 @@
             border-bottom: 1px solid grey;
         }
 
-        div#matches_container>div>span[name="map"] {
-            grid-area: mapname;
-            border-bottom: 1px solid grey;
+        div#matches_container>div>div[name] {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            text-align: center;
+            vertical-align: bottom;
+        }
+
+        div#matches_container>div>div[name="match_info"]>span:first-child {
             text-align: center;
             font-size: 1.5rem;
             font-weight: 900;
             margin-bottom: 5px;
         }
 
-        div#matches_container>div>span[name="mode"] {
-            grid-area: mode;
-            margin-bottom: 5px;
+        div#matches_container>div>div[name="match_stats"] {
+            display: grid;
+            grid-template-columns: 1fr;
         }
 
-        div#matches_container>div>span[name="time"] {
-            grid-area: time;
-            margin-bottom: 5px;
-        }
-
-        div#matches_container>div>span[name="header_results"] {
-            grid-area: hresults;
-            font-weight: 600;
-        }
-
-        div#matches_container>div>span[name="header_team1"] {
-            grid-area: hteam1;
-            font-weight: 600;
-        }
-
-        div#matches_container>div>span[name="header_team2"] {
-            grid-area: hteam2;
-            font-weight: 600;
-        }
-
-        div#matches_container>div>span[name="results"] {
-            grid-area: results;
-        }
-
-        div#matches_container>div>span[name="team1"] {
-            grid-area: team1;
-        }
-
-        div#matches_container>div>span[name="team2"] {
-            grid-area: team2;
-        }
-
-        div#matches_container>div>div[name] {
+        div#matches_container>div>div[name="match_stats"]>div {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            grid-auto-rows: 1fr;
+            line-height: 1rem;
             padding: 2px;
-        }
-
-        div#matches_container>div>div:nth-child(odd) {
-            background-color: snow;
-        }
-
-        div#matches_container>div>div:nth-child(even) {
-            background-color: lightgray;
-        }
-
-        div#matches_container>div>div[name="specialist"] {
-            grid-area: specialist;
+            padding: 4px 4px 4px 3rem;
             text-align: left;
         }
 
-        div#matches_container>div>div[name="assists"] {
-            grid-area: assists;
-            text-align: left;
+        div#matches_container>div>div[name="match_info"] {
+            border-bottom: 1px solid darkgray;
         }
 
-        div#matches_container>div>div[name="kills"] {
-            grid-area: kills;
-            text-align: left;
+        div#matches_container>div>div[name="match_results"] {
+            background-color: lightsteelblue;
         }
 
-        div#matches_container>div>div[name="deaths"] {
-            grid-area: deaths;
-            text-align: left;
-        }
-
-        div#matches_container>div>div[name="ekia"] {
-            grid-area: ekia;
-            text-align: left;
-        }
-
-        div#matches_container>div>div[name="ekiadratio"] {
-            grid-area: ekiadratio;
-            text-align: left;
-        }
-
-        div#matches_container>div>div[name="kdratio"] {
-            grid-area: kdratio;
-            text-align: left;
-        }
-
-        div#matches_container>div>div[name="score"] {
-            grid-area: score;
-            text-align: left;
-        }
-
-        div#matches_container>div>div[name="spm"] {
-            grid-area: spm;
-            text-align: left;
-        }
-
-        div#matches_container>div>span[name="header_matchstats"] {
-            grid-area: hmatchstats;
-            background-color: darkgray;
+        div#matches_container>div>div[name="match_stats"]>span {
             margin: 10px 0;
-            padding: 3px;
+        }
+
+        div#matches_container>div>div[name="match_stats"]>div:nth-child(even) {
+            background-color: lightgray;
         }
     </style>
 </head>
@@ -250,7 +183,7 @@
         const maps = new Map([
             ['mp_firingrange2', 'Firing Range'],
             ['mp_firingrange2_alt', 'Firing Range Night'],
-            ['mp_frenetic', 'mp_frenetic'],
+            ['mp_frenetic', 'Frequency'],
             ['mp_gridlock', 'Gridlock'],
             ['mp_hacienda', 'Hacienda'],
             ['mp_icebreaker', 'Icebreaker'],
@@ -323,9 +256,18 @@
             ['prt_mp_battery', 'Battery'],
             ['477755593455581584', 'Crash'],
             ['prt_mp_buffassault', 'Crash'],
+            ['prt_mp_engineer', 'Torque'],
             ['prt_mp_firebreak', 'Firebreak'],
+            ['prt_mp_trapper', 'Nomad'],
+            ['prt_mp_technomancer', 'Phrophet'],
             ['prt_mp_recon', 'Recon'],
-            ['prt_mp_enforcer', 'Seraph']
+            ['prt_mp_mercenary', 'Ruin'],
+            ['prt_mp_enforcer', 'Seraph'],
+            ['prt_mp_zero', 'Zero'],
+            ['1678473019291533497', 'Id Me 1'],
+            ['3824242445927398925', 'Id Me 2'],
+            ['659505269181990112', 'Id Me 3'],
+            ['4490741452057334797', 'Id Me 4']
         ]);
 
         // Get specialist name
@@ -375,54 +317,59 @@
             return matchesData.matches.map(e => {
                 return `
                     <div>
-                        <span name="map">${getMapName(e.map)}</span>
-                        <span name="mode">${getMode(e.mode)}</span>
-                        <span name="time">${getDate(e.utcStartSeconds)}</span>
-                        <span name="header_results">Result</span>
-                        <span name="header_team1">Team 1</span>
-                        <span name="header_team2">Team 2</span>
-                        <span name="results">${upperCaseFirst(e.result)}</span>
-                        <span name="team1">${winningTeam(e.team1Score, '1', e.winningTeam)}</span>
-                        <span name="team2">${winningTeam(e.team2Score, '2', e.winningTeam)}</span>
-                        <span name="header_matchstats">Match Stats</span>
-                        <div name="specialist">
-                            <span>Specialist</span>
-                            <span>${getSpecialists(e.player.specialistStats)}</span>
+                        <div name="match_info">
+                            <span>${getMapName(e.map)}</span>
+                            <span>${getMode(e.mode)}</span>
+                            <span>${getDate(e.utcStartSeconds)}</span>
                         </div>
-                        
-                        <div name="kills">
-                            <span>Kills</span>
-                            <span>${e.playerStats.kills}</span>
+                        <div name="match_results">
+                            <span name="header_results">Result</span>
+                            <span name="header_team1">Team 1</span>
+                            <span name="header_team2">Team 2</span>
+                            <span name="results">${upperCaseFirst(e.result)}</span>
+                            <span name="team1">${winningTeam(e.team1Score, '1', e.winningTeam)}</span>
+                            <span name="team2">${winningTeam(e.team2Score, '2', e.winningTeam)}</span>
                         </div>
-                        <div name="deaths">
-                            <span>Deaths</span>
-                            <span>${e.playerStats.deaths}</span>
+                        <div name="match_stats">
+                            <span>Match Stats</span>
+                            <div>
+                                <span>Specialist</span>
+                                <span>${getSpecialists(e.player.specialistStats)}</span>
+                            </div>
+                            
+                            <div>
+                                <span>Kills</span>
+                                <span>${e.playerStats.kills}</span>
+                            </div>
+                            <div>
+                                <span>Deaths</span>
+                                <span>${e.playerStats.deaths}</span>
+                            </div>
+                            <div>
+                                <span>K/D Ratio</span>
+                                <span>${rounder(e.playerStats.kdRatio)}</span>
+                            </div>
+                            <div>
+                                <span>Assists</span>
+                                <span>${e.playerStats.assists}</span>
+                            </div>
+                            <div>
+                                <span>EKIA</span>
+                                <span>${e.playerStats.ekia}</span>
+                            </div>
+                            <div>
+                                <span>EKIA/D Ratio</span>
+                                <span>${rounder(e.playerStats.ekiadRatio)}</span>
+                            </div>
+                            <div>
+                                <span>Score</span>
+                                <span>${e.playerStats.score}</span>
+                            </div>
+                            <div>
+                                <span>Score Per Minute</span>
+                                <span>${rounder(e.playerStats.scorePerMinute)}</span>
+                            </div>
                         </div>
-                        <div name="assists">
-                            <span>Assists</span>
-                            <span>${e.playerStats.assists}</span>
-                        </div>
-                        <div name="ekia">
-                            <span>EKIA</span>
-                            <span>${e.playerStats.ekia}</span>
-                        </div>
-                        <div name="ekiadratio">
-                            <span>EKIA/D Ratio</span>
-                            <span>${rounder(e.playerStats.ekiadRatio)}</span>
-                        </div>
-                        <div name="kdratio">
-                            <span>K/D Ratio</span>
-                            <span>${rounder(e.playerStats.kdRatio)}</span>
-                        </div>
-                        <div name="score">
-                            <span>Score</span>
-                            <span>${e.playerStats.score}</span>
-                        </div>
-                        <div name="spm">
-                            <span>Score Per Minute</span>
-                            <span>${rounder(e.playerStats.scorePerMinute)}</span>
-                        </div>
-
                     </div>
                     `;
             })
